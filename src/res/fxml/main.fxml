@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.media.MediaView?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="app.controller.MainController">
@@ -10,5 +11,8 @@
     <left>
         <fx:include source="list.fxml" fx:id="list"/>
     </left>
+    <center>
+        <fx:include source="player.fxml" fx:id="player"/>
+    </center>
 
 </BorderPane>
