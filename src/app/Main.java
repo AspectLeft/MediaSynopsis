@@ -29,6 +29,9 @@ public class Main extends Application {
 
         primaryStage.setTitle("Media Synopsis");
         primaryStage.setScene(new Scene(mainPane, 800, 600));
+        primaryStage.setOnHiding(windowEvent -> {
+            model.cleanup();
+        });
         primaryStage.show();
     }
 

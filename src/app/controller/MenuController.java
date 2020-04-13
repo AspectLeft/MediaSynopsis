@@ -36,7 +36,7 @@ public class MenuController {
         File selectedDir = directoryChooser.showDialog(menuBar.getScene().getWindow());
         if (selectedDir == null) return;
 
-        ProgressForm progressForm = new ProgressForm();
+        ProgressForm progressForm = new ProgressForm("Loading files...");
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() throws Exception {
@@ -66,12 +66,13 @@ public class MenuController {
         private final ProgressBar pb = new ProgressBar();
         private final ProgressIndicator pin = new ProgressIndicator();
 
-        public ProgressForm() {
+        public ProgressForm(String title) {
             dialogStage = new Stage();
             dialogStage.initStyle(StageStyle.UTILITY);
             dialogStage.setResizable(false);
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setOnCloseRequest(Event::consume);
+            dialogStage.setTitle(title);
 
             // PROGRESS BAR
             final Label label = new Label();

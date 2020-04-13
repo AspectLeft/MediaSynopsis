@@ -1,5 +1,6 @@
 package app.model;
 
+import app.util.FFmpegCli;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import net.bramp.ffmpeg.FFmpeg;
@@ -9,6 +10,7 @@ import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 public class Media {
     public Media(File file) {
@@ -29,12 +31,10 @@ public class Media {
     }
 
     public static String aviToMp4(File aviFile) throws IOException {
-        String tmpFileName = "output.mp4"; // TODO build ./tmp and store it with a random name, and sweep up on quit
+        String tmpFileName = buildTmpFileName();
 
-
-        // TODO give an exclusive progress bar when transforming
-        FFmpeg ffmpeg = new FFmpeg("F:/ffmpeg-20200403-52523b6-win64-static/bin/ffmpeg.exe");
-        FFprobe ffprobe = new FFprobe("F:/ffmpeg-20200403-52523b6-win64-static/bin/ffprobe.exe");
+        FFmpeg ffmpeg = FFmpegCli.getFFmpeg();
+        FFprobe ffprobe = FFmpegCli.getFFprobe();
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(aviFile.getPath())
                 .overrideOutputFiles(true)
@@ -46,6 +46,9 @@ public class Media {
         return tmpFileName;
     }
 
+    private static String buildTmpFileName() {
+        return String.format("tmp/%s.mp4", UUID.randomUUID().toString());
+    }
 
     protected final StringProperty fileName = new SimpleStringProperty();
     protected final javafx.scene.media.Media media;
