@@ -26,5 +26,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="org.jcodec:jcodec:0.2.3" level="project" />
+    <orderEntry type="library" name="org.jcodec:jcodec-javase:0.2.3" level="project" />
   </component>
 </module>
