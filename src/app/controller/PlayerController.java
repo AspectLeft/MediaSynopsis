@@ -20,12 +20,18 @@ public class PlayerController {
         this.dataModel = model;
 
         model.currentMediaProperty().addListener(((observableValue, m1, m2) -> {
+            if (m1 != null && m1.isPlaying()) {
+                m1.stop();
+            }
             if (m2 == null) return;
             if (m2.getIsImage()) {
                 imageView.setImage(m2.getImage());
                 return;
             }
-            imageView.setImage(m2.getFrames().get(0));
+            m2.currentFrameProperty().addListener(((observableValue1, image1, image2) -> {
+                imageView.setImage(image2);
+            }));
+            m2.play();
         }));
     }
 }

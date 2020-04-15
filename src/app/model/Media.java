@@ -1,10 +1,10 @@
 package app.model;
 
 import app.util.FFmpegCli;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.Observable;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import net.bramp.ffmpeg.FFmpeg;
@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Media {
     public Media(File file) {
@@ -32,6 +35,7 @@ public class Media {
             try {
                 file = new File(aviToMp4(file));
                 parseMp4(file);
+                this.executorService = Executors.newScheduledThreadPool(8);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -67,6 +71,7 @@ public class Media {
         while (null != (picture = grab.getNativeFrame())) {
             this.frames.add(SwingFXUtils.toFXImage(AWTUtil.toBufferedImage(picture), null));
         }
+        this.framesList.addAll(this.frames);
     }
 
     private static String buildTmpFileName() {
@@ -112,4 +117,45 @@ public class Media {
         return frames;
     }
 
+    private final ObservableList<Image> framesList = FXCollections.observableArrayList(image1 ->
+            new Observable[]{image1.widthProperty()});
+    private final ObjectProperty<Image> currentFrame = new SimpleObjectProperty<>(null);
+
+    public ObjectProperty<Image> currentFrameProperty() {
+        return currentFrame;
+    }
+
+    public final Image getCurrentImage() {
+        return currentFrame.get();
+    }
+
+    private final int[] index = new int[]{0};
+    private ScheduledExecutorService executorService = null;
+    private boolean isPlaying = false;
+
+    public void play() {
+        isPlaying = true;
+        executorService.scheduleAtFixedRate(() -> {
+            if (index[0] >= this.frames.size()) {
+                stop();
+            }
+            currentFrameProperty().setValue(this.frames.get(index[0]));
+            index[0]++;
+        }, 0, 33, TimeUnit.MILLISECONDS);
+    }
+
+    public void pause() {
+        executorService.shutdown();
+    }
+
+    public void stop() {
+        pause();
+        isPlaying = false;
+        index[0] = 0;
+        currentFrameProperty().setValue(this.frames.get(index[0]));
+    }
+
+    public boolean isPlaying() {
+        return this.isPlaying;
+    }
 }

@@ -40,6 +40,9 @@ public class DataModel {
     }
 
     public void cleanup() {
+        if (currentMedia.get().isPlaying()) {
+            currentMedia.get().stop();
+        }
         String[] entries = tmpDir.list();
         for(String s: entries){
             File currentFile = new File(tmpDir.getPath(),s);
