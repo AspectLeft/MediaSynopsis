@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.media.MediaPlayer;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.FFprobe;
@@ -16,6 +17,9 @@ import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +45,14 @@ public class Media {
                 e.printStackTrace();
             }
         }
+        else if (getFileName().endsWith(".mp4")) {
+            try {
+                parseMp4(file);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.executorService = Executors.newScheduledThreadPool(8);
+        }
         else if (getFileName().endsWith(".jpg")) {
             setIsImage(true);
             setImage(new Image(path));
@@ -49,22 +61,11 @@ public class Media {
     }
 
     public static String aviToMp4(File aviFile) throws IOException {
-        String tmpFileName = buildTmpFileName();
-
-        FFmpeg ffmpeg = FFmpegCli.getFFmpeg();
-        FFprobe ffprobe = FFmpegCli.getFFprobe();
-        FFmpegBuilder builder = new FFmpegBuilder()
-                .setInput(aviFile.getPath())
-                .overrideOutputFiles(true)
-                .addOutput(tmpFileName)
-                .setFormat("mp4").done();
-
-        FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
-        executor.createJob(builder).run();
-        return tmpFileName;
+        return transform(aviFile, "mp4");
     }
 
     private void parseMp4(File file) throws Exception {
+        // video
         FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(file));
         Picture picture;
         this.frames = new ArrayList<>();
@@ -72,10 +73,32 @@ public class Media {
             this.frames.add(SwingFXUtils.toFXImage(AWTUtil.toBufferedImage(picture), null));
         }
         this.framesList.addAll(this.frames);
+
+        // audio
+        audioFile = new File(transform(file, "mp3"));
+
+        audioMedia = new javafx.scene.media.Media(audioFile.toURI().toString());
+        audioPlayer = new MediaPlayer(audioMedia);
     }
 
-    private static String buildTmpFileName() {
-        return String.format("tmp/%s.mp4", UUID.randomUUID().toString());
+    private static String transform(File inputFile, String outputFormat) throws IOException {
+        String tmpFileName = buildTmpFileName(outputFormat);
+
+        FFmpeg ffmpeg = FFmpegCli.getFFmpeg();
+        FFprobe ffprobe = FFmpegCli.getFFprobe();
+        FFmpegBuilder builder = new FFmpegBuilder()
+                .setInput(inputFile.getPath())
+                .overrideOutputFiles(true)
+                .addOutput(tmpFileName)
+                .setFormat(outputFormat).done();
+
+        FFmpegExecutor executor = new FFmpegExecutor(ffmpeg, ffprobe);
+        executor.createJob(builder).run();
+        return tmpFileName;
+    }
+
+    private static String buildTmpFileName(String format) {
+        return String.format("tmp/%s.%s", UUID.randomUUID().toString(), format);
     }
 
     protected final StringProperty fileName = new SimpleStringProperty();
@@ -135,6 +158,7 @@ public class Media {
 
     public void play() {
         isPlaying = true;
+        audioPlayer.play();
         executorService.scheduleAtFixedRate(() -> {
             if (index[0] >= this.frames.size()) {
                 stop();
@@ -145,12 +169,15 @@ public class Media {
     }
 
     public void pause() {
+        audioPlayer.pause();
         executorService.shutdown();
     }
 
     public void stop() {
-        pause();
         isPlaying = false;
+
+        pause();
+        audioPlayer.stop();
         index[0] = 0;
         currentFrameProperty().setValue(this.frames.get(index[0]));
     }
@@ -158,4 +185,10 @@ public class Media {
     public boolean isPlaying() {
         return this.isPlaying;
     }
+
+    private File audioFile;
+
+    private javafx.scene.media.Media audioMedia;
+    private MediaPlayer audioPlayer;
+
 }

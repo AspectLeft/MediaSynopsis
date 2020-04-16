@@ -40,7 +40,7 @@ public class DataModel {
     }
 
     public void cleanup() {
-        if (currentMedia.get().isPlaying()) {
+        if (currentMedia.get() != null && currentMedia.get().isPlaying()) {
             currentMedia.get().stop();
         }
         String[] entries = tmpDir.list();
