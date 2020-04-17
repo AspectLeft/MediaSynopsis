@@ -3,6 +3,7 @@ package app.controller;
 import app.model.DataModel;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -14,7 +15,7 @@ public class MainController {
     public MenuController menuController;
     public StackPane list;
     public ListController listController;
-    public AnchorPane player;
+    public BorderPane player;
     public PlayerController playerController;
 
     public void initModel(DataModel model) {

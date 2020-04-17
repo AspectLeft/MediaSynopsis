@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.image.ImageView?>
-<AnchorPane xmlns="http://javafx.com/javafx"
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="app.controller.PlayerController"
-            prefHeight="400.0" prefWidth="600.0">
-    <ImageView fx:id="imageView"/>
-</AnchorPane>
+            prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@../css/player.css">
+    <center>
+        <ImageView fx:id="imageView"/>
+    </center>
+    <bottom>
+        <HBox>
+            <Button fx:id="playButton" onAction="#play" disable="true"/>
+            <Button fx:id="pauseButton" onAction="#pause" disable="true"/>
+            <Button fx:id="stopButton" onAction="#stop" disable="true"/>
+        </HBox>
+    </bottom>
+</BorderPane>

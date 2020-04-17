@@ -1,0 +1,19 @@
+Button {
+    -fx-pref-height: 20;
+    -fx-pref-width: 20;
+    -fx-background-size: 18 18;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+}
+
+#playButton {
+    -fx-background-image: url("../icon/baseline_play_arrow_black_18dp.png");
+}
+
+#pauseButton {
+    -fx-background-image: url("../icon/baseline_pause_black_18dp.png");
+}
+
+#stopButton {
+    -fx-background-image: url("../icon/baseline_stop_black_18dp.png");
+}

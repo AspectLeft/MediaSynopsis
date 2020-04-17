@@ -17,15 +17,13 @@ import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Picture;
 import org.jcodec.scale.AWTUtil;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -154,12 +152,30 @@ public class Media {
 
     private final int[] index = new int[]{0};
     private ScheduledExecutorService executorService = null;
-    private boolean isPlaying = false;
+    private Future<?> future;
+
+    private BooleanProperty stoppedProperty = new SimpleBooleanProperty();
+    public BooleanProperty getStoppedProperty() {
+        return this.stoppedProperty;
+    }
+    private void setStoppedProperty(boolean b) {
+        this.stoppedProperty.setValue(b);
+    }
+
+    private BooleanProperty isPlayingProperty = new SimpleBooleanProperty();
+    public BooleanProperty getIsPlayingProperty() {
+        return this.isPlayingProperty;
+    }
+    private void setIsPlayingProperty(boolean b) {
+        this.isPlayingProperty.setValue(b);
+    }
 
     public void play() {
-        isPlaying = true;
+        setIsPlayingProperty(true);
+        setStoppedProperty(false);
+
         audioPlayer.play();
-        executorService.scheduleAtFixedRate(() -> {
+        future = executorService.scheduleAtFixedRate(() -> {
             if (index[0] >= this.frames.size()) {
                 stop();
             }
@@ -169,13 +185,14 @@ public class Media {
     }
 
     public void pause() {
+        if (!getIsPlayingProperty().get()) return;
+        setIsPlayingProperty(false);
         audioPlayer.pause();
-        executorService.shutdown();
+        future.cancel(false);
     }
 
     public void stop() {
-        isPlaying = false;
-
+        stoppedProperty.setValue(true);
         pause();
         audioPlayer.stop();
         index[0] = 0;
@@ -183,7 +200,7 @@ public class Media {
     }
 
     public boolean isPlaying() {
-        return this.isPlaying;
+        return getIsPlayingProperty().get();
     }
 
     private File audioFile;
