@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Slider?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="app.controller.PlayerController"
@@ -14,10 +15,11 @@
         <ImageView fx:id="imageView"/>
     </center>
     <bottom>
-        <HBox>
+        <HBox alignment="CENTER">
             <Button fx:id="playButton" onAction="#play" disable="true"/>
             <Button fx:id="pauseButton" onAction="#pause" disable="true"/>
             <Button fx:id="stopButton" onAction="#stop" disable="true"/>
+            <Slider fx:id="timeSlider" HBox.hgrow="ALWAYS" disable="true"/>
         </HBox>
     </bottom>
 </BorderPane>

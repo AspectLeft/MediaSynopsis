@@ -34,6 +34,7 @@ public class Media {
         System.out.println(path);
 
         if (getFileName().endsWith(".avi")) {
+            setIsVideo(true);
             try {
                 file = new File(aviToMp4(file));
                 parseMp4(file);
@@ -44,6 +45,7 @@ public class Media {
             }
         }
         else if (getFileName().endsWith(".mp4")) {
+            setIsVideo(true);
             try {
                 parseMp4(file);
             } catch (Exception e) {
@@ -123,6 +125,20 @@ public class Media {
 
     public final void setIsImage(final boolean b) {
         this.isImage.setValue(b);
+    }
+
+    private final BooleanProperty isVideo = new SimpleBooleanProperty();
+
+    public final BooleanProperty isVideoProperty() {
+        return this.isVideo;
+    }
+
+    public final boolean getIsVideo() {
+        return this.isVideo.get();
+    }
+
+    public final void setIsVideo(final boolean b) {
+        this.isVideo.setValue(b);
     }
 
     private Image image;
@@ -206,6 +222,22 @@ public class Media {
     private File audioFile;
 
     private javafx.scene.media.Media audioMedia;
-    private MediaPlayer audioPlayer;
+    public MediaPlayer audioPlayer;
 
+    public void videoSeek(double percent) {
+        if (!getIsVideo()) return;
+
+        boolean wasPlaying = false;
+        if (isPlaying()) {
+            pause();
+            wasPlaying = true;
+        }
+        index[0] = (int) (framesList.size() * percent / 100);
+        currentFrameProperty().setValue(this.frames.get(index[0]));
+        audioPlayer.seek(audioPlayer.getMedia().getDuration().multiply(percent / 100));
+
+        if (wasPlaying) {
+            play();
+        }
+    }
 }

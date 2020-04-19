@@ -63,4 +63,10 @@ public class DataModel {
         }
         mediaList.addAll(bufferlist);
     }
+
+    public void videoSeek(double percent) {
+        if (getCurrentMedia() != null) {
+            getCurrentMedia().videoSeek(percent);
+        }
+    }
 }
