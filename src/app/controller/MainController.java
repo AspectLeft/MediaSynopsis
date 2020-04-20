@@ -23,4 +23,8 @@ public class MainController {
         listController.initModel(model);
         playerController.initModel(model);
     }
+
+    public void cleanup() {
+        playerController.cleanup();
+    }
 }

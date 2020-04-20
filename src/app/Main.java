@@ -31,6 +31,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(mainPane, 800, 600));
         primaryStage.setOnHiding(windowEvent -> {
             model.cleanup();
+            mainController.cleanup();
         });
         primaryStage.show();
     }

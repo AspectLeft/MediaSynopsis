@@ -40,8 +40,8 @@ public class DataModel {
     }
 
     public void cleanup() {
-        if (currentMedia.get() != null && currentMedia.get().isPlaying()) {
-            currentMedia.get().stop();
+        for (Media media: mediaList) {
+            media.cleanup();
         }
         String[] entries = tmpDir.list();
         for(String s: entries){
@@ -50,6 +50,7 @@ public class DataModel {
             currentFile.delete();
         }
         tmpDir.delete();
+        System.out.println("Quiting...");
     }
 
     public void loadData(File dir) {

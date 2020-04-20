@@ -59,13 +59,8 @@ public class PlayerController {
             stopButton.disableProperty().bind(m2.getStoppedProperty());
             timeSlider.setDisable(false);
 
-            timeSliderUpdater = ov -> {
-                Platform.runLater(() -> {
-                    timeSlider.setValue(m2.audioPlayer.getCurrentTime().toMillis() /
-                            m2.audioPlayer.getTotalDuration().toMillis()
-                                    * 100);
-                });
-            };
+            timeSliderUpdater = ov -> Platform.runLater(() -> timeSlider.setValue(
+                    m2.audioPlayer.getCurrentTime().toMillis() / m2.audioPlayer.getTotalDuration().toMillis() * 100));
             m2.audioPlayer.currentTimeProperty().addListener(timeSliderUpdater);
             m2.play();
         }));
@@ -93,4 +88,9 @@ public class PlayerController {
     }
 
 
+    public void cleanup() {
+        playButton.disableProperty().unbind();
+        pauseButton.disableProperty().unbind();
+        stopButton.disableProperty().unbind();
+    }
 }

@@ -240,4 +240,11 @@ public class Media {
             play();
         }
     }
+
+    public void cleanup() {
+        if (executorService != null) {
+            executorService.shutdown();
+        }
+        
+    }
 }
