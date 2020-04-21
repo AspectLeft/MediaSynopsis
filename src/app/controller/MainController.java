@@ -2,6 +2,7 @@ package app.controller;
 
 import app.model.DataModel;
 import javafx.fxml.FXML;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -17,11 +18,14 @@ public class MainController {
     public ListController listController;
     public BorderPane player;
     public PlayerController playerController;
+    public ScrollPane synopsis;
+    public SynopsisController synopsisController;
 
     public void initModel(DataModel model) {
         menuController.initModel(model);
         listController.initModel(model);
         playerController.initModel(model);
+        synopsisController.initModel();
     }
 
     public void cleanup() {

@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
 
-//TODO add a control panel
 public class PlayerController {
     @FXML
     public ImageView imageView;

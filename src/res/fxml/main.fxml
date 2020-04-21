@@ -14,5 +14,8 @@
     <center>
         <fx:include source="player.fxml" fx:id="player"/>
     </center>
+    <bottom>
+        <fx:include source="synopsis.fxml" fx:id="synopsis"/>
+    </bottom>
 
 </BorderPane>
