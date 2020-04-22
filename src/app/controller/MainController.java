@@ -25,7 +25,7 @@ public class MainController {
         menuController.initModel(model);
         listController.initModel(model);
         playerController.initModel(model);
-        synopsisController.initModel();
+        synopsisController.initModel(model);
     }
 
     public void cleanup() {

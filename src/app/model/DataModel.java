@@ -34,9 +34,27 @@ public class DataModel {
 
     private File tmpDir;
 
+    private final ObjectProperty<Synopsis> synopsis = new SimpleObjectProperty<>(null);
+
+    public ObjectProperty<Synopsis> synopsisProperty() {
+        return synopsis;
+    }
+
+    public final Synopsis getSynopsis() {
+        return synopsis.get();
+    }
+
+    public final void setSynopsis(Synopsis synopsis) {
+        this.synopsis.set(synopsis);
+    }
+
+    SynopsisGeneratorBase generator;
+
     public DataModel() {
         tmpDir = new File("tmp");
         tmpDir.mkdirs();
+
+        generator = new NaiveSynopsisGenerator();
     }
 
     public void cleanup() {
@@ -63,6 +81,8 @@ public class DataModel {
             bufferlist.add(new Media(file));
         }
         mediaList.addAll(bufferlist);
+
+        setSynopsis(generator.generate(mediaList));
     }
 
     public void videoSeek(double percent) {
