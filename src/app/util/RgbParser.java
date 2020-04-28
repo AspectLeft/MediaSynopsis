@@ -34,7 +34,7 @@ public class RgbParser {
                     byte g = bytes[ind+height*width];
                     byte b = bytes[ind+height*width*2];
 
-                    int pix = ImageTrasform.buildRGB(r, g, b);
+                    int pix = ImageTransform.buildRGB(r, g, b);
                     //int pix = ((a << 24) + (r << 16) + (g << 8) + b);
                     pixelWriter.setArgb(x,y,pix);
                     ind++;

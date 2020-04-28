@@ -5,7 +5,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 
-public class ImageTrasform {
+public class ImageTransform {
     private static final int[][] DIRS = {
             {-1, -1}, {0, -1}, {1, -1},
             {-1, 0}, {0, 0}, {1, 0},
@@ -15,7 +15,7 @@ public class ImageTrasform {
     private int W0, H0;
     private Image img0;
 
-    public ImageTrasform(Image image) {
+    public ImageTransform(Image image) {
         this.img0 = image;
         this.W0 = (int) img0.getWidth();
         this.H0 = (int) img0.getHeight();

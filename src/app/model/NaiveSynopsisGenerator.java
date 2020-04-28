@@ -1,7 +1,7 @@
 package app.model;
 
 import app.controller.SynopsisController;
-import app.util.ImageTrasform;
+import app.util.ImageTransform;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
@@ -37,7 +37,7 @@ public class NaiveSynopsisGenerator extends SynopsisGeneratorBase {
     }
 
     private Synopsis.MediaCoordinate addComponent(Media media, Image image, PixelWriter pixelWriter, double time) {
-        ImageTrasform trasform = new ImageTrasform(image);
+        ImageTransform trasform = new ImageTransform(image);
         Image thumbnail = trasform.scale(100.0 / image.getHeight(), true);
         PixelReader pixelReader = thumbnail.getPixelReader();
         for (int x = 0; x < thumbnail.getWidth(); ++x) {
