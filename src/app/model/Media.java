@@ -1,6 +1,7 @@
 package app.model;
 
 import app.util.FFmpegCli;
+import app.util.RgbParser;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ import org.jcodec.scale.AWTUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -28,12 +30,27 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Media {
+    protected static final int W0 = 352, H0 = 288;
+
+
     public Media(File file) {
         setFileName(file.getName());
         String path = file.toURI().toString();
         System.out.println(path);
 
-        if (getFileName().endsWith(".avi")) {
+        // We regard a dir as a video composed of rgb files
+        if (file.isDirectory()) {
+            setIsVideo(true);
+
+            try {
+                parseDir(file);
+                this.executorService = Executors.newScheduledThreadPool(8);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        else if (getFileName().endsWith(".avi")) {
             setIsVideo(true);
             try {
                 file = new File(aviToMp4(file));
@@ -57,7 +74,22 @@ public class Media {
             setIsImage(true);
             setImage(new Image(path));
         }
+        else if (getFileName().endsWith(".rgb")) {
+            setIsImage(true);
+            setImage(RgbParser.readImageRGB(W0, H0, file));
+        }
 
+    }
+
+    private void parseDir(File dir) {
+        File[] files = dir.listFiles();
+        if (files == null) return;
+        Arrays.sort(files);
+        this.frames = new ArrayList<>();
+        for (File rgbFile: files) {
+            this.frames.add(RgbParser.readImageRGB(W0, H0, rgbFile));
+        }
+        framesList.addAll(this.frames);
     }
 
     public static String aviToMp4(File aviFile) throws IOException {
@@ -167,6 +199,15 @@ public class Media {
     }
 
     private final int[] index = new int[]{0};
+
+    private IntegerProperty indexProperty = new SimpleIntegerProperty();
+    public IntegerProperty getIndexProperty() {
+        return this.indexProperty;
+    }
+    private void setIndexProperty(int v) {
+        this.indexProperty.setValue(v);
+    }
+
     private ScheduledExecutorService executorService = null;
     private Future<?> future;
 
@@ -190,29 +231,31 @@ public class Media {
         setIsPlayingProperty(true);
         setStoppedProperty(false);
 
-        audioPlayer.play();
+        if (audioPlayer != null) audioPlayer.play();
         future = executorService.scheduleAtFixedRate(() -> {
             if (index[0] >= this.frames.size()) {
                 stop();
             }
             currentFrameProperty().setValue(this.frames.get(index[0]));
             index[0]++;
+            setIndexProperty(index[0]);
         }, 0, 33, TimeUnit.MILLISECONDS);
     }
 
     public void pause() {
         if (!getIsPlayingProperty().get()) return;
         setIsPlayingProperty(false);
-        audioPlayer.pause();
+        if (audioPlayer != null) audioPlayer.pause();
         future.cancel(false);
     }
 
     public void stop() {
         stoppedProperty.setValue(true);
         pause();
-        audioPlayer.stop();
+        if (audioPlayer != null) audioPlayer.stop();
         index[0] = 0;
         currentFrameProperty().setValue(this.frames.get(index[0]));
+        setIndexProperty(index[0]);
     }
 
     public boolean isPlaying() {
@@ -221,8 +264,8 @@ public class Media {
 
     private File audioFile;
 
-    private javafx.scene.media.Media audioMedia;
-    public MediaPlayer audioPlayer;
+    private javafx.scene.media.Media audioMedia = null;
+    public MediaPlayer audioPlayer = null;
 
     public void videoSeek(double percent) {
         if (!getIsVideo()) return;
@@ -234,7 +277,10 @@ public class Media {
         }
         index[0] = (int) (framesList.size() * percent / 100);
         currentFrameProperty().setValue(this.frames.get(index[0]));
-        audioPlayer.seek(audioPlayer.getMedia().getDuration().multiply(percent / 100));
+        setIndexProperty(index[0]);
+        if (audioPlayer != null) {
+            audioPlayer.seek(audioPlayer.getMedia().getDuration().multiply(percent / 100));
+        }
 
         if (wasPlaying) {
             play();
@@ -245,6 +291,12 @@ public class Media {
         if (executorService != null) {
             executorService.shutdown();
         }
-        
+    }
+
+    public void addAudio(File audioFile) {
+        this.audioFile = audioFile;
+
+        audioMedia = new javafx.scene.media.Media(audioFile.toURI().toString());
+        audioPlayer = new MediaPlayer(audioMedia);
     }
 }

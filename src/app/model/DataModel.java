@@ -85,6 +85,10 @@ public class DataModel {
         setSynopsis(generator.generate(mediaList));
     }
 
+    public void generateSynposis() {
+        setSynopsis(generator.generate(mediaList));
+    }
+
     public void videoSeek(double percent) {
         if (getCurrentMedia() != null) {
             getCurrentMedia().videoSeek(percent);

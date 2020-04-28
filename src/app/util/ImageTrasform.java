@@ -47,7 +47,7 @@ public class ImageTrasform {
         return img;
     }
 
-    private static int buildRGB(int r, int g, int b) {
+    public static int buildRGB(int r, int g, int b) {
         return 0xff000000 | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
     }
 

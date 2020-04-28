@@ -1,7 +1,9 @@
 package app.controller;
 
 import app.model.DataModel;
+import app.model.Media;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -60,6 +62,56 @@ public class MenuController {
         menuBar.getScene().getWindow().hide();
     }
 
+    @FXML
+    public void addImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("RGB Files (*.rgb)", "*.rgb"));
+        File imageFile = fileChooser.showOpenDialog(menuBar.getScene().getWindow());
+        if (imageFile == null) return;
+        progressFormTask("Loading image", new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                model.getMediaList().add(new Media(imageFile));
+                return null;
+            }
+        });
+    }
+
+    @FXML
+    public void addVideo() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDir = directoryChooser.showDialog(menuBar.getScene().getWindow());
+        if (selectedDir == null) return;
+
+        progressFormTask("Loading video", new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                model.getMediaList().add(new Media(selectedDir));
+                return null;
+            }
+        });
+    }
+
+    public void generateSynopsis() {
+        progressFormTask("Generating synopsis...", new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                model.generateSynposis();
+                return null;
+            }
+        });
+    }
+
+    public static void progressFormTask(String title, Task<Void> task) {
+        ProgressForm progressForm = new ProgressForm(title);
+        progressForm.activateProgressBar(task);
+        task.setOnSucceeded(event -> progressForm.getDialogStage().close());
+
+        progressForm.getDialogStage().show();
+
+        Thread thread = new Thread(task);
+        thread.start();
+    }
 
     public static class ProgressForm {
         private final Stage dialogStage;

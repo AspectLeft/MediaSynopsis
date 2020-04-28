@@ -59,9 +59,9 @@ public class PlayerController {
             timeSlider.setDisable(false);
 
             timeSliderUpdater = ov -> Platform.runLater(() -> timeSlider.setValue(
-                    m2.audioPlayer.getCurrentTime().toMillis() / m2.audioPlayer.getTotalDuration().toMillis() * 100));
-            m2.audioPlayer.currentTimeProperty().addListener(timeSliderUpdater);
-            m2.play();
+                    1.0 * m2.getIndexProperty().getValue() / m2.getFrames().size() * 100));
+            m2.getIndexProperty().addListener(timeSliderUpdater);
+            //m2.play();
         }));
 
         timeSlider.valueProperty().addListener(observable -> {
