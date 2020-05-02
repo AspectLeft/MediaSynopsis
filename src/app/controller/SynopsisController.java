@@ -11,7 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class SynopsisController {
-    public static final int W = 800;
+    public static final int W = 1200;
     public static final int H = 100;
 
     @FXML

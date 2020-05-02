@@ -17,6 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.stage.*;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuController {
 
@@ -87,6 +89,27 @@ public class MenuController {
             @Override
             protected Void call() throws Exception {
                 model.getMediaList().add(new Media(selectedDir));
+                return null;
+            }
+        });
+    }
+
+    @FXML
+    public void addImages() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDir = directoryChooser.showDialog(menuBar.getScene().getWindow());
+        if (selectedDir == null) return;
+
+        progressFormTask("Loading images", new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                File[] files = selectedDir.listFiles();
+                if (files == null) return null;
+                List<Media> imageList = new ArrayList<>();
+                for (File imageFile: files) {
+                    imageList.add(new Media(imageFile));
+                }
+                model.getMediaList().addAll(imageList);
                 return null;
             }
         });

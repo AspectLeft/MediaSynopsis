@@ -8,6 +8,7 @@
     <MenuBar fx:id="menuBar">
         <Menu text="%Menu.File">
             <MenuItem text="%Menu.AddImage" onAction="#addImage"/>
+            <MenuItem text="%Menu.AddImages" onAction="#addImages"/>
             <MenuItem text="%Menu.AddVideo" onAction="#addVideo"/>
             <SeparatorMenuItem />
             <MenuItem text="%Menu.Quit" onAction="#exit"/>
