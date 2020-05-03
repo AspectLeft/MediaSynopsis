@@ -8,7 +8,9 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DataModel {
     private final ObservableList<Media> mediaList = FXCollections.observableArrayList(media ->
@@ -54,7 +56,7 @@ public class DataModel {
         tmpDir = new File("tmp");
         tmpDir.mkdirs();
 
-        generator = new ImpleSynopsisGenerator();
+        generator = new NaiveSynopsisGenerator();
     }
 
     public void cleanup() {
@@ -93,5 +95,13 @@ public class DataModel {
         if (getCurrentMedia() != null) {
             getCurrentMedia().videoSeek(percent);
         }
+    }
+
+    public void loadSynopsis(File selectedDir) {
+        Map<String, Media> mediaMap = new HashMap<>();
+        for (Media media: this.getMediaList()) {
+            mediaMap.put(media.getFileName(), media);
+        }
+        this.setSynopsis(Synopsis.load(selectedDir, mediaMap));
     }
 }

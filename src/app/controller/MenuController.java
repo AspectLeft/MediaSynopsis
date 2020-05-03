@@ -3,9 +3,7 @@ package app.controller;
 import app.model.DataModel;
 import app.model.Media;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -120,6 +118,35 @@ public class MenuController {
             @Override
             protected Void call() throws Exception {
                 model.generateSynposis();
+                return null;
+            }
+        });
+    }
+
+    public void saveSynopsis() {
+        if (model.getSynopsis() == null) return;
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDir = directoryChooser.showDialog(menuBar.getScene().getWindow());
+        if (selectedDir == null) return;
+
+        progressFormTask("Saving Synopsis", new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                model.getSynopsis().save(selectedDir);
+                return null;
+            }
+        });
+    }
+
+    public void loadSynopsis() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDir = directoryChooser.showDialog(menuBar.getScene().getWindow());
+        if (selectedDir == null) return;
+
+        progressFormTask("Choose Synopsis folder", new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                model.loadSynopsis(selectedDir);
                 return null;
             }
         });

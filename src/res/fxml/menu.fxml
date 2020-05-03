@@ -15,6 +15,8 @@
         </Menu>
         <Menu text="%Menu.Edit">
             <MenuItem text="%Menu.GenerateSynopsis" onAction="#generateSynopsis"/>
+            <MenuItem text="%Menu.SaveSynopsis" onAction="#saveSynopsis"/>
+            <MenuItem text="%Menu.LoadSynopsis" onAction="#loadSynopsis"/>
         </Menu>
     </MenuBar>
 

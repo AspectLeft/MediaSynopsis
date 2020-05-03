@@ -3,7 +3,6 @@ package app.controller;
 import app.model.DataModel;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Slider;
@@ -31,7 +30,7 @@ public class PlayerController {
             if (m1 != null && m1.isPlaying()) {
                 m1.stop();
             }
-            if (m1 != null && m1.getIsVideo()) {
+            if (m1 != null && m1.getIsVideo() && m1.audioPlayer != null) {
                 m1.audioPlayer.currentTimeProperty().removeListener(timeSliderUpdater);
             }
             playButton.disableProperty().unbind();
