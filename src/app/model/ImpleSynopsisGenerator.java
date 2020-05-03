@@ -79,9 +79,6 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     }
 
 
-    int x0 = 0;
-    int frameStride = 3000;
-
     int width = 352;
     int height = 288;
     int size = 8;
@@ -119,10 +116,10 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
 
     }
 
-    private int difference(int video, int frame) {
+    private int difference(int video, int frame,int frameStride) {
         int diff = 0;
         int[][][] frame1 = readImageRGB(video, frame);
-        int[][][] frame2 = readImageRGB(video, frame + 1);
+        int[][][] frame2 = readImageRGB(video, frame + frameStride);
 
         for (int i = 0; i < width / size; i++) {
             for (int j = 0; j < height / size; j++) {
@@ -166,12 +163,12 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         return diff;
     }
 
-    private void findFrameChange(int video) {
+    private void findFrameChange(int video,int frameStride) {
         ArrayList<Integer> tempFrameChange = new ArrayList<>();
         tempFrameChange.add(0);
-        for (int i = 0; i < videoFrameList.get(video).size()-1; i++) {
-            int temp = difference(video, i);
-            System.out.println("Frame:"+i+"   value:"+temp);
+        for (int i = 0; i < videoFrameList.get(video).size()-frameStride; i = i+frameStride) {
+            int temp = difference(video, i,frameStride);
+
             if (temp > 4000000) {
                 System.out.println(i + ". " + temp);
                 // if(sceneChange.size()>0&&i-sceneChange.get(sceneChange.size()-1)>10)
@@ -188,13 +185,13 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     private void findKeyFrame() {
 
         if (imageList.size() > keyNum / 2) {
-            System.out.println("Image1");
+
             for (int i = 0; i < keyNum / 2; i++) {
                 keyFrame.add(new FrameMediaMatch(imageList.get(i),imageList.get(i).getImage()));
                 --keyNum;
             }
         } else {
-            System.out.println("Image2");
+
             for (Media image : imageList) {
                 keyFrame.add(new FrameMediaMatch(image,image.getImage()));
                 --keyNum;
@@ -204,7 +201,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         if (keyNum <= 0) return;
 
         if (keyNum > keyFrameNum) {
-            System.out.println("Video1");
+
             int numPerScene = (keyNum / keyFrameNum) + 1;
             for (int i = 0; i < videoFrameList.size(); i++) {
                 ArrayList<Image> list = videoFrameList.get(i);
@@ -213,13 +210,16 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                     for (double k = 1.0; k <= numPerScene; k++) {
 
                         double pos = (k / (numPerScene + 1)) * (change.get(j)-change.get(j - 1) )+change.get(j-1);
-                        System.out.println(pos +" "+k+" "+(numPerScene + 1));
+
                         keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get((int) pos), (pos*100) / list.size()));
+                        keyNum--;
                     }
+                    keyFrameNum--;
+                    if(keyNum<=keyFrameNum)numPerScene = 1;
                 }
             }
         } else if (keyNum == keyFrameNum) {
-            System.out.println("Video2");
+
             for (int i = 0; i < videoFrameList.size(); i++) {
                 ArrayList<Image> list = videoFrameList.get(i);
                 ArrayList<Integer> change = sceneChange.get(i);
@@ -229,7 +229,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 }
             }
         } else if (keyNum > videoFrameList.size()) {
-            System.out.println("Video3");
+
             int pos = 0;
             while (keyNum > 0) {
                 ArrayList<Image> list = videoFrameList.get(pos);
@@ -248,7 +248,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 pos++;
             }
         } else if (keyNum <= videoFrameList.size()) {
-            System.out.println("Video4");
+
             for (int i = 0; i < videoFrameList.size(); i++) {
                 ArrayList<Image> list = videoFrameList.get(i);
                 keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get(list.size() / 2), 50.0));
@@ -263,14 +263,12 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         int w = (int) ((width / scale) * (0.5 * (keyNum - 1)));
         int h = height * 3 / (2 * scale);
 
-        System.out.println(w + " " + h);
-        System.out.println(keyFrame.size());
+        //System.out.println(keyFrame.size());
         int[][][] result = new int[w][h][3];
         int[][][][] images = new int[keyNum][width / scale][height / scale][3];
         for (int i = 0; i < keyNum; i++) {
             images[i] = reader(i, 1.0 / scale);
         }
-        System.out.println("Finish reading image");
         // Create boundary
         int[] bound = new int[w];
         int h1 = h / 3;
@@ -327,7 +325,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                             result[x + p][y + q][2] = images[i][p][q][2];
 
                             if(!set.contains(index)){
-                                System.out.println(keyFrame.get(i).getTime());
+                                //System.out.println(keyFrame.get(i).getTime());
                                 Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x+p,y+q,keyFrame.get(i).getMedia(),keyFrame.get(i).getTime());
                                 coordinateList.add(mc);
                                 set.add(index);
@@ -341,7 +339,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                             result[x + p][y + q][2] = images[i][p][q][2];
 
                             if(!set.contains(index)){
-                                System.out.println(keyFrame.get(i).getTime());
+                                //System.out.println(keyFrame.get(i).getTime());
                                 Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x+p,y+q,keyFrame.get(i).getMedia(),keyFrame.get(i).getTime());
                                 coordinateList.add(mc);
                                 set.add(index);
@@ -477,7 +475,6 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         int[][][] temp = new int[w][h][3];
         Image image = keyFrame.get(pos).getFrame();
         PixelReader pixel = image.getPixelReader();
-        System.out.println("get image");
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
                 // byte a = 0;
@@ -517,9 +514,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     @Override
     public Synopsis generate(List<Media> mediaList) {
         // TODO Auto-generated method stub
-        WritableImage writableImage = new WritableImage(SynopsisController.W, SynopsisController.H);
-        PixelWriter pixelWriter = writableImage.getPixelWriter();
-        List<Synopsis.MediaCoordinate> coordinateList = new ArrayList<>();
+        int frameStride = 30;
 
         for (Media media : mediaList) {
             if (media.getIsImage()) {
@@ -532,7 +527,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
 
         for(int i = 0;i<videoList.size();i++){
 
-            findFrameChange(i);
+            findFrameChange(i,frameStride);
         }
         /*
         ArrayList<Integer> list = new ArrayList<>();
