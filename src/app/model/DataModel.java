@@ -54,7 +54,7 @@ public class DataModel {
         tmpDir = new File("tmp");
         tmpDir.mkdirs();
 
-        generator = new NaiveSynopsisGenerator();
+        generator = new ImpleSynopsisGenerator();
     }
 
     public void cleanup() {
