@@ -78,6 +78,31 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         }
     }
 
+    private class SceneChangeThread implements Runnable{
+        int pos;
+        int frameStride;
+        public SceneChangeThread(int pos,int frameStride){
+            this.pos = pos;
+            this.frameStride = frameStride;
+        }
+
+        @Override
+        public void run() {
+            sceneChange.get(pos).add(0);
+            for (int i = 0; i < videoFrameList.get(pos).size()-frameStride; i = i+frameStride) {
+                int temp = difference(pos, i,frameStride);
+
+                if (temp > thereshold) {
+                    System.out.println(pos+" "+i + ". " + temp);
+                    sceneChange.get(pos).add(i);
+                    keyFrameNum++;
+                }
+            }
+            sceneChange.get(pos).add(videoFrameList.get(pos).size() - 1);
+            keyFrameNum++;
+            System.out.println("Finish");
+        }
+    }
 
     int width = 352;
     int height = 288;
@@ -85,18 +110,16 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     int k = 16;
     int scale = 4;
     int keyNum = 29;
-    int keyFrameNum = 0;
+    volatile int keyFrameNum = 0;
+    int thereshold = 6000000;
 
-    ArrayList<ArrayList<Integer>> sceneChange = new ArrayList<>();
+    volatile ArrayList<ArrayList<Integer>> sceneChange = new ArrayList<>();
     ArrayList<FrameMediaMatch> keyFrame = new ArrayList<>();
     ArrayList<Media> imageList = new ArrayList<>();
     ArrayList<Media> videoList = new ArrayList<>();
-    ArrayList<ArrayList<Image>> videoFrameList = new ArrayList<>();
+    volatile ArrayList<ArrayList<Image>> videoFrameList = new ArrayList<>();
 
-    /**
-     * Read Image RGB Reads the image of given width and height at the given imgPath
-     * into the provided BufferedImage.
-     */
+
     private int[][][] readImageRGB(int video, int frame) {
         int[][][] result = new int[width][height][3];
         Image image = videoFrameList.get(video).get(frame);
@@ -169,7 +192,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         for (int i = 0; i < videoFrameList.get(video).size()-frameStride; i = i+frameStride) {
             int temp = difference(video, i,frameStride);
 
-            if (temp > 4000000) {
+            if (temp > thereshold) {
                 System.out.println(i + ". " + temp);
                 // if(sceneChange.size()>0&&i-sceneChange.get(sceneChange.size()-1)>10)
                 tempFrameChange.add(i);
@@ -183,10 +206,10 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     }
 
     private void findKeyFrame() {
-
-        if (imageList.size() > keyNum / 2) {
-
-            for (int i = 0; i < keyNum / 2; i++) {
+        System.out.println(keyNum+" "+keyFrameNum+" "+imageList.size());
+        if (imageList.size() > keyNum -keyFrameNum) {
+            int num = keyNum-keyFrameNum;
+            for (int i = 0; i < num; i++) {
                 keyFrame.add(new FrameMediaMatch(imageList.get(i),imageList.get(i).getImage()));
                 --keyNum;
             }
@@ -197,7 +220,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 --keyNum;
             }
         }
-
+        System.out.println("AfterImage"+keyNum+" "+keyFrameNum+" "+imageList.size());
         if (keyNum <= 0) return;
 
         if (keyNum > keyFrameNum) {
@@ -524,11 +547,28 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
             }
         }
         System.out.println("Start finding frame change");
-
+        /*
         for(int i = 0;i<videoList.size();i++){
-
             findFrameChange(i,frameStride);
+        }*/
+
+        Thread[] threads = new Thread[videoList.size()];
+        for(int i = 0;i<videoList.size();i++) {
+            sceneChange.add(new ArrayList<Integer>());
+            SceneChangeThread t = new SceneChangeThread(i,frameStride);
+            Thread thread = new Thread(t);
+            threads[i] = thread;
+            thread.start();
         }
+        try {
+            for(int i = 0;i<videoList.size();i++) {
+                threads[i].join();
+            }
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         /*
         ArrayList<Integer> list = new ArrayList<>();
         list.add(0);
