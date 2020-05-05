@@ -32,7 +32,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         private Image frame;
         private boolean isImage;
 
-        public FrameMediaMatch(Media media,Image frame) {
+        public FrameMediaMatch(Media media, Image frame) {
             this.media = media;
             this.frame = frame;
             isImage = true;
@@ -78,10 +78,11 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         }
     }
 
-    private class SceneChangeThread implements Runnable{
+    private class SceneChangeThread implements Runnable {
         int pos;
         int frameStride;
-        public SceneChangeThread(int pos,int frameStride){
+
+        public SceneChangeThread(int pos, int frameStride) {
             this.pos = pos;
             this.frameStride = frameStride;
         }
@@ -89,11 +90,11 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         @Override
         public void run() {
             sceneChange.get(pos).add(0);
-            for (int i = 0; i < videoFrameList.get(pos).size()-frameStride; i = i+frameStride) {
-                int temp = difference(pos, i,frameStride);
+            for (int i = 0; i < videoFrameList.get(pos).size() - frameStride; i = i + frameStride) {
+                int temp = difference(pos, i, frameStride);
 
                 if (temp > thereshold) {
-                    System.out.println(pos+" "+i + ". " + temp);
+                    System.out.println(pos + " " + i + ". " + temp);
                     sceneChange.get(pos).add(i);
                     keyFrameNum++;
                 }
@@ -128,9 +129,9 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
                 Color color = pr.getColor(x, y);
-                result[x][y][0] = (int) (color.getRed()*255);
-                result[x][y][1] = (int) (color.getGreen()*255);
-                result[x][y][2] = (int) (color.getBlue()*255);
+                result[x][y][0] = (int) (color.getRed() * 255);
+                result[x][y][1] = (int) (color.getGreen() * 255);
+                result[x][y][2] = (int) (color.getBlue() * 255);
 
             }
         }
@@ -139,7 +140,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
 
     }
 
-    private int difference(int video, int frame,int frameStride) {
+    private int difference(int video, int frame, int frameStride) {
         int diff = 0;
         int[][][] frame1 = readImageRGB(video, frame);
         int[][][] frame2 = readImageRGB(video, frame + frameStride);
@@ -186,11 +187,11 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         return diff;
     }
 
-    private void findFrameChange(int video,int frameStride) {
+    private void findFrameChange(int video, int frameStride) {
         ArrayList<Integer> tempFrameChange = new ArrayList<>();
         tempFrameChange.add(0);
-        for (int i = 0; i < videoFrameList.get(video).size()-frameStride; i = i+frameStride) {
-            int temp = difference(video, i,frameStride);
+        for (int i = 0; i < videoFrameList.get(video).size() - frameStride; i = i + frameStride) {
+            int temp = difference(video, i, frameStride);
 
             if (temp > thereshold) {
                 System.out.println(i + ". " + temp);
@@ -206,21 +207,21 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     }
 
     private void findKeyFrame() {
-        System.out.println(keyNum+" "+keyFrameNum+" "+imageList.size());
-        if (imageList.size() > keyNum -keyFrameNum) {
-            int num = keyNum-keyFrameNum;
+        System.out.println(keyNum + " " + keyFrameNum + " " + imageList.size());
+        if (imageList.size() > keyNum - keyFrameNum) {
+            int num = keyNum - keyFrameNum;
             for (int i = 0; i < num; i++) {
-                keyFrame.add(new FrameMediaMatch(imageList.get(i),imageList.get(i).getImage()));
+                keyFrame.add(new FrameMediaMatch(imageList.get(i), imageList.get(i).getImage()));
                 --keyNum;
             }
         } else {
 
             for (Media image : imageList) {
-                keyFrame.add(new FrameMediaMatch(image,image.getImage()));
+                keyFrame.add(new FrameMediaMatch(image, image.getImage()));
                 --keyNum;
             }
         }
-        System.out.println("AfterImage"+keyNum+" "+keyFrameNum+" "+imageList.size());
+        System.out.println("AfterImage" + keyNum + " " + keyFrameNum + " " + imageList.size());
         if (keyNum <= 0) return;
 
         if (keyNum > keyFrameNum) {
@@ -232,13 +233,13 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 for (int j = 1; j < change.size(); j++) {
                     for (double k = 1.0; k <= numPerScene; k++) {
 
-                        double pos = (k / (numPerScene + 1)) * (change.get(j)-change.get(j - 1) )+change.get(j-1);
+                        double pos = (k / (numPerScene + 1)) * (change.get(j) - change.get(j - 1)) + change.get(j - 1);
 
-                        keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get((int) pos), (pos*100) / list.size()));
+                        keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get((int) pos), (pos * 100) / list.size()));
                         keyNum--;
                     }
                     keyFrameNum--;
-                    if(keyNum<=keyFrameNum)numPerScene = 1;
+                    if (keyNum <= keyFrameNum) numPerScene = 1;
                 }
             }
         } else if (keyNum == keyFrameNum) {
@@ -248,7 +249,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 ArrayList<Integer> change = sceneChange.get(i);
                 for (int j = 1; j < change.size(); j++) {
                     double pos = ((double) change.get(j - 1) + change.get(j)) / 2;
-                    keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get((int) pos), (pos*100) / list.size()));
+                    keyFrame.add(new FrameMediaMatch(videoList.get(i), list.get((int) pos), (pos * 100) / list.size()));
                 }
             }
         } else if (keyNum > videoFrameList.size()) {
@@ -260,7 +261,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                     ArrayList<Integer> change = sceneChange.get(pos);
                     for (int j = 1; j < change.size(); j++) {
                         double p = ((double) change.get(j - 1) + change.get(j)) / 2;
-                        keyFrame.add(new FrameMediaMatch(videoList.get(pos), list.get((int) p), (p*100) / list.size()));
+                        keyFrame.add(new FrameMediaMatch(videoList.get(pos), list.get((int) p), (p * 100) / list.size()));
                         keyNum--;
                         if (keyNum <= videoFrameList.size() - pos - 1) break;
                     }
@@ -338,7 +339,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
             int y = i % 2 == 0 ? h / 3 : 0;
             for (int p = 0; p < width / scale; p++) {
                 for (int q = 0; q < height / scale; q++) {
-                    int index = (y+q)*w+x+p;
+                    int index = (y + q) * w + x + p;
                     if (x + p < 0 || x + p >= w)
                         continue;
                     if (i % 2 == 0) {
@@ -347,9 +348,9 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                             result[x + p][y + q][1] = images[i][p][q][1];
                             result[x + p][y + q][2] = images[i][p][q][2];
 
-                            if(!set.contains(index)){
+                            if (!set.contains(index)) {
                                 //System.out.println(keyFrame.get(i).getTime());
-                                Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x+p,y+q,keyFrame.get(i).getMedia(),keyFrame.get(i).getTime());
+                                Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x + p, y + q, keyFrame.get(i).getMedia(), keyFrame.get(i).getTime());
                                 coordinateList.add(mc);
                                 set.add(index);
                             }
@@ -361,9 +362,9 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                             result[x + p][y + q][1] = images[i][p][q][1];
                             result[x + p][y + q][2] = images[i][p][q][2];
 
-                            if(!set.contains(index)){
+                            if (!set.contains(index)) {
                                 //System.out.println(keyFrame.get(i).getTime());
-                                Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x+p,y+q,keyFrame.get(i).getMedia(),keyFrame.get(i).getTime());
+                                Synopsis.MediaCoordinate mc = new Synopsis.MediaCoordinate(x + p, y + q, keyFrame.get(i).getMedia(), keyFrame.get(i).getTime());
                                 coordinateList.add(mc);
                                 set.add(index);
                             }
@@ -442,54 +443,66 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
 
         }
 
+
+
+
+        c = 0; // vertical
+        for (int i = 1; i < w; i++) {
+
+            if (i % 88 == 0) {
+                System.out.println(88);
+                for (int j = 2*h/3; j < h; j++) {
+                    int part = 0;
+                    for (int k = -1; k <= 2; k++) {
+                        double per = (5 + (part++ * 30)) / 100.0;
+                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
+                        result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
+                        result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
+                        result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
+                    }
+                }
+                c++;
+            } else if (i % 44 == 0) {
+                System.out.println(44);
+                for (int j = 0; j < h / 3; j++) {
+                    int part = 0;
+                    for (int k = -1; k <= 2; k++) {
+                        double per = (5 + (part++ * 30)) / 100.0;
+                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5-k-1):(k-1)));
+                        result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][0]*per);
+                        result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][1]*per);
+                        result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][2]*per);
+                    }
+                }
+                c++;
+            } else if (i % 22 == 0) {
+                System.out.println(22);
+                for (int j = h/3; j < 2*h / 3; j++) {
+                    int part = 0;
+                    for (int k = -1; k <= 2; k++) {
+                        double per = (5 + (part++ * 30)) / 100.0;
+                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
+                        result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
+                        result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
+                        result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
+                    }
+                }
+
+            }
+
+        }
         System.out.println("Creating result");
-        for(int i = 0;i<w;i++){
-            for(int j = 0;j<h;j++){
-                Color color = Color.rgb(result[i][j][0],result[i][j][1],result[i][j][2]);
-                pixelWriter.setColor(i,j,color);
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Color color = Color.rgb(result[i][j][0], result[i][j][1], result[i][j][2]);
+                pixelWriter.setColor(i, j, color);
             }
         }
 
+        return new
 
-        /*
-         * c = -1; // vertical for (int i = 1; i < w; i++) {
-         *
-         * if (i % 176 == 0) { for (int j = 0; j < h/3; j++) { int part = 1; for (int k
-         * = -10; k < 10; k += 2) { double per = part++ / 10; result[i + k][j][0] =
-         * (int) (images[c][width / scale + (k - 10) / 2][j][0] * (1 - per) + images[c +
-         * 2][(10 + k) / 2][j][0] * per); result[i + k + 1][j][0] = (int)
-         * (images[c][width / scale + (k - 10) / 2][j][0] * (1 - per) + images[c +
-         * 2][(10 + k) / 2][j][0] * per); result[i + k][j][1] = (int) (images[c][width /
-         * scale + (k - 10) / 2][j][1] * (1 - per) + images[c + 2][(10 + k) / 2][j][1] *
-         * per); result[i + k + 1][j][1] = (int) (images[c][width / scale + (k - 10) /
-         * 2][j][1] * (1 - per) + images[c + 2][(10 + k) / 2][j][1] * per); result[i +
-         * k][j][2] = (int) (images[c][width / scale + (k - 10) / 2][j][2] * (1 - per) +
-         * images[c + 2][(10 + k) / 2][j][2] * per); result[i + k + 1][j][2] = (int)
-         * (images[c][width / scale + (k - 10) / 2][j][2] * (1 - per) + images[c +
-         * 2][(10 + k) / 2][j][2] * per); } } } else if (i % 88 == 0) { for (int j = 2 *
-         * h / 3; j < h; j++) { int part = 1; for (int k = -10; k < 10; k += 2) { double
-         * per = part++ / 10; //System.out.println(i+" "+j+" "+k+" "+(j - h / 3));
-         * result[i + k][j][0] = (int) (images[c][width / scale + (k - 10) / 2][j - h /
-         * 3][0] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][0] * per);
-         * result[i + k + 1][j][0] = (int) (images[c][width / scale + (k - 10) / 2][j -
-         * h / 3][0] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][0] * per);
-         * result[i + k][j][1] = (int) (images[c][width / scale + (k - 10) / 2][j - h /
-         * 3][1] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][1] * per);
-         * result[i + k + 1][j][1] = (int) (images[c][width / scale + (k - 10) / 2][j -
-         * h / 3][1] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][1] * per);
-         * result[i + k][j][2] = (int) (images[c][width / scale + (k - 10) / 2][j - h /
-         * 3][2] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][2] * per);
-         * result[i + k + 1][j][2] = (int) (images[c][width / scale + (k - 10) / 2][j -
-         * h / 3][2] * (1 - per) + images[c + 2][(10 + k) / 2][j - h / 3][2] * per); } }
-         * }
-         *
-         * if (bound[i] != bound[i - 1]) { c++; } }
-         */
+                Synopsis(writableImage, coordinateList);
 
-
-
-
-        return new Synopsis(writableImage,coordinateList);
     }
 
     private int[][][] reader(int pos, double scale) {
@@ -504,9 +517,9 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 Position ind = calPos(x, y, scale);
                 Color c = pixel.getColor(ind.x, ind.y);
 
-                temp[x][y][0] = (int) (c.getRed()*255);
-                temp[x][y][1] = (int) (c.getGreen()*255);
-                temp[x][y][2] = (int) (c.getBlue()*255);
+                temp[x][y][0] = (int) (c.getRed() * 255);
+                temp[x][y][1] = (int) (c.getGreen() * 255);
+                temp[x][y][2] = (int) (c.getBlue() * 255);
             }
         }
 
@@ -553,15 +566,15 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         }*/
 
         Thread[] threads = new Thread[videoList.size()];
-        for(int i = 0;i<videoList.size();i++) {
+        for (int i = 0; i < videoList.size(); i++) {
             sceneChange.add(new ArrayList<Integer>());
-            SceneChangeThread t = new SceneChangeThread(i,frameStride);
+            SceneChangeThread t = new SceneChangeThread(i, frameStride);
             Thread thread = new Thread(t);
             threads[i] = thread;
             thread.start();
         }
         try {
-            for(int i = 0;i<videoList.size();i++) {
+            for (int i = 0; i < videoList.size(); i++) {
                 threads[i].join();
             }
         } catch (InterruptedException e) {
