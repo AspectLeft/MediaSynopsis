@@ -92,7 +92,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
             sceneChange.get(pos).add(0);
             for (int i = 0; i < videoFrameList.get(pos).size() - frameStride; i = i + frameStride) {
                 int temp = difference(pos, i, frameStride);
-
+                //System.out.println(i + "." + temp);
                 if (temp > thereshold) {
                     System.out.println(pos + " " + i + ". " + temp);
                     sceneChange.get(pos).add(i);
@@ -112,7 +112,8 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
     int scale = 4;
     int keyNum = 29;
     volatile int keyFrameNum = 0;
-    int thereshold = 6000000;
+    int thereshold = 1800000;
+    //int[] threholds = {4000000,1800000,1700000,1500000};
 
     volatile ArrayList<ArrayList<Integer>> sceneChange = new ArrayList<>();
     ArrayList<FrameMediaMatch> keyFrame = new ArrayList<>();
@@ -210,7 +211,10 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         System.out.println(keyNum + " " + keyFrameNum + " " + imageList.size());
         if (imageList.size() > keyNum - keyFrameNum) {
             int num = keyNum - keyFrameNum;
-            for (int i = 0; i < num; i++) {
+            int dis = (imageList.size()/num);
+            int count = 0;
+            for (int i = 0; i < imageList.size(); i=i+dis) {
+                if(count++>=num)break;
                 keyFrame.add(new FrameMediaMatch(imageList.get(i), imageList.get(i).getImage()));
                 --keyNum;
             }
@@ -221,7 +225,7 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 --keyNum;
             }
         }
-        System.out.println("AfterImage" + keyNum + " " + keyFrameNum + " " + imageList.size());
+        System.out.println("AfterImage" + keyNum + " " + keyFrameNum + " " + keyFrame.size());
         if (keyNum <= 0) return;
 
         if (keyNum > keyFrameNum) {
@@ -450,12 +454,12 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
         for (int i = 1; i < w; i++) {
 
             if (i % 88 == 0) {
-                System.out.println(88);
+                //System.out.println(88);
                 for (int j = 2*h/3; j < h; j++) {
                     int part = 0;
                     for (int k = -1; k <= 2; k++) {
                         double per = (5 + (part++ * 30)) / 100.0;
-                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
+                        //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
                         result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
                         result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
                         result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
@@ -463,12 +467,12 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 }
                 c++;
             } else if (i % 44 == 0) {
-                System.out.println(44);
+                //System.out.println(44);
                 for (int j = 0; j < h / 3; j++) {
                     int part = 0;
                     for (int k = -1; k <= 2; k++) {
                         double per = (5 + (part++ * 30)) / 100.0;
-                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5-k-1):(k-1)));
+                        //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5-k-1):(k-1)));
                         result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][0]*per);
                         result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][1]*per);
                         result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][2]*per);
@@ -476,12 +480,12 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
                 }
                 c++;
             } else if (i % 22 == 0) {
-                System.out.println(22);
+                //System.out.println(22);
                 for (int j = h/3; j < 2*h / 3; j++) {
                     int part = 0;
                     for (int k = -1; k <= 2; k++) {
                         double per = (5 + (part++ * 30)) / 100.0;
-                        System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
+                        //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
                         result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
                         result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
                         result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+1][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
