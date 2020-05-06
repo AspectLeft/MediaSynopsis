@@ -1,18 +1,17 @@
 package app.model;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import app.controller.SynopsisController;
-import app.model.Synopsis;
-//import app.util.ImageTrasform;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+//import app.util.ImageTrasform;
 
 
 public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {

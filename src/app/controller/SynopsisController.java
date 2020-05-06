@@ -1,13 +1,11 @@
 package app.controller;
 
-import app.model.*;
-import javafx.event.EventHandler;
+import app.model.DataModel;
+import app.model.Synopsis;
 import javafx.fxml.FXML;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class SynopsisController {
