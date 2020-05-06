@@ -455,33 +455,33 @@ public class ImpleSynopsisGenerator extends SynopsisGeneratorBase {
 
             if (i % 88 == 0) {
                 //System.out.println(88);
-                for (int j = 2*h/3; j < h; j++) {
+                for (int j = 5; j < h/3-5; j++) {
                     int part = 0;
                     for (int k = -1; k <= 2; k++) {
                         double per = (5 + (part++ * 30)) / 100.0;
                         //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5+k-1):(k-1)));
-                        result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
-                        result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
-                        result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
-                    }
-                }
-                c++;
-            } else if (i % 44 == 0) {
-                //System.out.println(44);
-                for (int j = 0; j < h / 3; j++) {
-                    int part = 0;
-                    for (int k = -1; k <= 2; k++) {
-                        double per = (5 + (part++ * 30)) / 100.0;
-                        //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5-k-1):(k-1)));
                         result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][0]*per);
                         result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][1]*per);
                         result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j][2]*per);
                     }
                 }
                 c++;
+            } else if (i % 44 == 0) {
+                //System.out.println(44);
+                for (int j = 2*h/3+5; j < h-5; j++) {
+                    int part = 0;
+                    for (int k = -1; k <= 2; k++) {
+                        double per = (5 + (part++ * 30)) / 100.0;
+                        //System.out.println(per+" "+((k<=0)?(width/scale+k-1):(width/scale-5+k-1))+" "+((k<=0)?(5-k-1):(k-1)));
+                        result[i + k][j][0]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][0]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][0]*per);
+                        result[i + k][j][1]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][1]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][1]*per);
+                        result[i + k][j][2]=(int)(images[c][(k<=0)?(width/scale+k-1):(width/scale-5+k-1)][j-h/3][2]*(1-per)+images[c+2][(k<=0)?(5+k-1):(k-1)][j-h/3][2]*per);
+                    }
+                }
+                c++;
             } else if (i % 22 == 0) {
                 //System.out.println(22);
-                for (int j = h/3; j < 2*h / 3; j++) {
+                for (int j = h/3+5; j < 2*h / 3-5; j++) {
                     int part = 0;
                     for (int k = -1; k <= 2; k++) {
                         double per = (5 + (part++ * 30)) / 100.0;
